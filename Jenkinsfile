@@ -1,9 +1,6 @@
 pipeline {
-    agent {
-        node {
-            label 'jenkins-slave-node'
-        }
-    }
+    agent any 
+    
     environment {
         PATH = "/opt/apache-maven-3.9.6/bin:$PATH"
     }

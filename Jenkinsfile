@@ -8,7 +8,7 @@ pipeline {
         PATH = "/opt/apache-maven-3.9.6/bin:$PATH"
     }
     stages {
-        stage("build"){
+        stage("build stage"){
             steps {
                 echo "----------- build started ----------"
                 sh 'mvn clean package -Dmaven.test.skip=true'
@@ -16,7 +16,7 @@ pipeline {
             }
         }
          
-        stage("test"){
+        stage("test stage"){
             steps{
                 echo "----------- unit test started ----------"
                 sh 'mvn surefire-report:report'
@@ -31,6 +31,19 @@ pipeline {
             steps{
                 withSonarQubeEnv('sonar-server-meportal') {
                     sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
+        }
+
+        stage("Quality Gate"){
+            steps {
+                script {
+                    timeout(time: 1, unit: 'HOURS') { 
+                        def qg = waitForQualityGate() 
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        }
+                    }
                 }
             }
         }

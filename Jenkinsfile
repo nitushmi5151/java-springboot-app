@@ -25,7 +25,7 @@ pipeline {
                 echo "----------- unit test Completed ----------"
             }
         }
-
+        /*
         stage('SonarQube Analysis') {
             environment {
                 scannerHome = tool 'sonar-scanner-meportal'
@@ -49,23 +49,23 @@ pipeline {
                 }
             }
         }
-
+        */
         stage("Artifact Publish") {
             steps {
                 script {
                     echo '------------- Artifact Publish Started ------------'
-                    def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"artfiact-cred"
+                    def server = Artifactory.newServer url:"https://meportal.jfrog.io//artifactory" ,  credentialsId:"jfrog-cred"
                     def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
                     def uploadSpec = """{
-                    "files": [
-                    {
-                    "pattern": "staging/(*)",
-                    "target": "libs-release-local/{1}",
-                    "flat": "false",
-                    "props" : "${properties}",
-                    "exclusions": [ "*.sha1", "*.md5"]
-                    }
-                    ]
+                        "files": [
+                            {
+                                "pattern": "staging/(*)",
+                                "target": "libs-release-local/{1}",
+                                "flat": "false",
+                                "props" : "${properties}",
+                                "exclusions": [ "*.sha1", "*.md5"]
+                            }
+                        ]
                     }"""
                     def buildInfo = server.upload(uploadSpec)
                     buildInfo.env.collect()
